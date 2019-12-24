@@ -5,27 +5,7 @@ import com.epam.izh.rd.online.repository.AuthorRepository;
 
 public class SimpleAuthorService implements AuthorService {
 
-    private AuthorRepository authorRepository = new AuthorRepository() {
-        @Override
-        public boolean save(Author author) {
-            return false;
-        }
-
-        @Override
-        public Author findByFullName(String name, String lastName) {
-            return null;
-        }
-
-        @Override
-        public boolean remove(Author author) {
-            return false;
-        }
-
-        @Override
-        public int count() {
-            return 0;
-        }
-    };
+    private AuthorRepository authorRepository;
 
     public SimpleAuthorService() {
     }
@@ -36,21 +16,29 @@ public class SimpleAuthorService implements AuthorService {
 
     @Override
     public boolean save(Author author) {
+        if (authorRepository.findByFullName(author.getName(), author.getLastName()) == null) {
+            authorRepository.save(author);
+            return true;
+        }
         return false;
     }
 
     @Override
     public Author findByFullName(String name, String lastName) {
-        return null;
+        return authorRepository.findByFullName(name, lastName);
     }
 
     @Override
     public boolean remove(Author author) {
+        if (authorRepository.findByFullName(author.getName(), author.getLastName()) != null) {
+            authorRepository.remove(author);
+            return true;
+        }
         return false;
     }
 
     @Override
     public int count() {
-        return 0;
+        return authorRepository.count();
     }
 }

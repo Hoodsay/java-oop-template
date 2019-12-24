@@ -8,13 +8,12 @@ public class SimpleAuthorRepository implements AuthorRepository {
 
     @Override
     public boolean save(Author author) {
-        if (findByFullName(author.getName(), author.getLastName()) == null) {
-            Author[] tempAuthor = new Author[authors.length + 1];
-            System.arraycopy(authors, 0, tempAuthor, 0, authors.length);
-            authors = tempAuthor;
-            return true;
-        }
-        return false;
+        Author[] tempAuthor = new Author[authors.length];
+        System.arraycopy(authors, 0, tempAuthor, 0, authors.length);
+        authors = new Author[authors.length + 1];
+        System.arraycopy(tempAuthor, 0, authors, 0, tempAuthor.length);
+        authors[authors.length - 1] = author;
+        return true;
     }
 
     @Override
@@ -29,11 +28,21 @@ public class SimpleAuthorRepository implements AuthorRepository {
 
     @Override
     public boolean remove(Author author) {
-        return false;
+        Author[] tempAuthor = new Author[authors.length];
+        System.arraycopy(authors, 0, tempAuthor, 0, authors.length);
+        authors = new Author[authors.length - 1];
+        for (Author authorGiven: tempAuthor) {
+            int i = 0;
+            if (!(author.getName().equalsIgnoreCase(authorGiven.getName()) && author.getLastName().equalsIgnoreCase(authorGiven.getLastName()))) {
+                authors[i] = authorGiven;
+                i++;
+            }
+        }
+        return true;
     }
 
     @Override
     public int count() {
-        return 0;
+        return authors.length;
     }
 }

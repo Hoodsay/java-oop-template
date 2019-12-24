@@ -7,49 +7,9 @@ import com.epam.izh.rd.online.repository.BookRepository;
 
 public class SimpleSchoolBookService implements BookService {
 
-    private BookRepository<SchoolBook> schoolBookBookRepository = new BookRepository<SchoolBook>() {
-        @Override
-        public boolean save(SchoolBook book) {
-            return false;
-        }
+    private BookRepository<SchoolBook> schoolBookBookRepository;
 
-        @Override
-        public SchoolBook[] findByName(String name) {
-            return new SchoolBook[0];
-        }
-
-        @Override
-        public boolean removeByName(String name) {
-            return false;
-        }
-
-        @Override
-        public int count() {
-            return 0;
-        }
-    };
-
-    private AuthorService authorService = new AuthorService() {
-        @Override
-        public boolean save(Author author) {
-            return false;
-        }
-
-        @Override
-        public Author findByFullName(String name, String lastName) {
-            return null;
-        }
-
-        @Override
-        public boolean remove(Author author) {
-            return false;
-        }
-
-        @Override
-        public int count() {
-            return 0;
-        }
-    };
+    private AuthorService authorService;
 
     public SimpleSchoolBookService() {
     }
@@ -61,31 +21,39 @@ public class SimpleSchoolBookService implements BookService {
 
     @Override
     public boolean save(Book book) {
+        if (authorService.findByFullName(((SchoolBook) book).getAuthorName(), ((SchoolBook) book).getAuthorLastName()) != null) {
+            return schoolBookBookRepository.save((SchoolBook) book);
+        }
         return false;
     }
 
     @Override
     public Book[] findByName(String name) {
-        return new Book[0];
+        return schoolBookBookRepository.findByName(name);
     }
 
     @Override
     public int getNumberOfBooksByName(String name) {
-        return 0;
+        return schoolBookBookRepository.findByName(name).length;
     }
 
     @Override
     public boolean removeByName(String name) {
-        return false;
+        return schoolBookBookRepository.removeByName(name);
     }
 
     @Override
     public int count() {
-        return 0;
+        return schoolBookBookRepository.count();
     }
 
     @Override
     public Author findAuthorByBookName(String name) {
-        return null;
+        if (schoolBookBookRepository.findByName(name).length != 0) {
+            String authorName = schoolBookBookRepository.findByName(name)[0].getAuthorName();
+            String authorLastName = schoolBookBookRepository.findByName(name)[0].getAuthorLastName();
+            return authorService.findByFullName(authorName, authorLastName);
+        }
+    return null;
     }
 }
